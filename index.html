@@ -1,0 +1,287 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Will you be my Valentine?</title>
+  <style>
+    :root { --cardW: min(760px, 92vw); }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 20% 10%, #ffd6e7, #ffd1dc 35%, #f7b7c8);
+    }
+
+    .card {
+      width: var(--cardW);
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      padding: 28px 24px 18px;
+      box-shadow: 0 18px 60px rgba(0,0,0,0.16);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .top {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+      padding-top: 6px;
+    }
+
+    .kitty {
+      width: 90px;
+      height: 90px;
+      border-radius: 999px;
+      background: #f6b07a;
+      position: relative;
+    }
+    .kitty:before, .kitty:after {
+      content: "";
+      position: absolute;
+      top: 6px;
+      width: 0; height: 0;
+      border-left: 14px solid transparent;
+      border-right: 14px solid transparent;
+      border-bottom: 24px solid #e79a64;
+    }
+    .kitty:before { left: 8px; transform: rotate(-12deg); }
+    .kitty:after  { right: 8px; transform: rotate(12deg); }
+
+    .eye {
+      position: absolute;
+      top: 35px;
+      width: 10px; height: 10px;
+      border-radius: 999px;
+      background: #111;
+    }
+    .eye.left { left: 28px; }
+    .eye.right{ right: 28px; }
+    .nose {
+      position: absolute;
+      top: 52px; left: 50%;
+      width: 10px; height: 8px;
+      transform: translateX(-50%);
+      background: #ff5b8a;
+      border-radius: 4px 4px 10px 10px;
+    }
+    .heart {
+      position: absolute;
+      right: -2px;
+      top: -2px;
+      width: 34px;
+      height: 34px;
+      background: #ff3b6b;
+      transform: rotate(45deg);
+      border-radius: 6px;
+      box-shadow: 0 10px 18px rgba(255,59,107,0.25);
+    }
+    .heart:before, .heart:after {
+      content: "";
+      position: absolute;
+      width: 34px;
+      height: 34px;
+      background: #ff3b6b;
+      border-radius: 999px;
+    }
+    .heart:before { left: -17px; top: 0; }
+    .heart:after  { top: -17px; left: 0; }
+
+    h1 {
+      margin: 0;
+      text-align: center;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      font-size: clamp(28px, 4.2vw, 44px);
+      color: #121212;
+    }
+    .name {
+      text-transform: lowercase;
+      font-weight: 900;
+    }
+
+    .play {
+      margin-top: 22px;
+      position: relative;
+      height: 140px;
+    }
+
+    .btn {
+      border: 0;
+      cursor: pointer;
+      font-weight: 800;
+      font-size: 22px;
+      border-radius: 999px;
+      padding: 16px 28px;
+      box-shadow: 0 12px 26px rgba(0,0,0,0.18);
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    #yesBtn {
+      background: #ff2f6f;
+      color: #fff;
+      position: absolute;
+      left: 24%;
+      top: 30%;
+      transform: translate(-50%, -50%);
+    }
+    #noBtn {
+      background: #e9e9ee;
+      color: #333;
+      position: absolute;
+      left: 70%;
+      top: 32%;
+      transform: translate(-50%, -50%);
+    }
+
+    .hint {
+      margin-top: 12px;
+      text-align: center;
+      color: #333;
+      opacity: 0.8;
+      font-size: 14px;
+    }
+
+    /* Result modal */
+    .modal {
+      position: fixed;
+      inset: 0;
+      display: none;
+      place-items: center;
+      background: rgba(0,0,0,0.35);
+      padding: 22px;
+    }
+    .modal.open { display: grid; }
+    .modal-box {
+      width: min(560px, 92vw);
+      background: white;
+      border-radius: 18px;
+      padding: 22px 18px;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.28);
+      text-align: center;
+    }
+    .modal-box h2 { margin: 10px 0 8px; }
+    .modal-box p { margin: 0 0 14px; color: #444; }
+    .small {
+      font-size: 12px;
+      color: #666;
+      margin-top: 10px;
+    }
+
+    /* Respect reduced motion */
+    @media (prefers-reduced-motion: reduce) {
+      #noBtn { transition: none !important; }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="card" id="card">
+    <section class="top">
+      <div class="kitty" aria-hidden="true">
+        <div class="heart"></div>
+        <div class="eye left"></div>
+        <div class="eye right"></div>
+        <div class="nose"></div>
+      </div>
+
+      <h1><span class="name" id="who">Little Bird</span> will you be my valentine?</h1>
+    </section>
+
+    <section class="play" id="arena" aria-label="Valentine buttons area">
+      <button class="btn" id="yesBtn">Yes</button>
+      <button class="btn" id="noBtn">No</button>
+    </section>
+
+    <div class="hint" id="hint">“No” seems a bit shy 😈</div>
+  </main>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <div class="modal-box">
+      <h2 id="mTitle">Yaaaay! 💘</h2>
+      <p id="mText">Best decision ever. See you on Valentine’s 😉</p>
+      <button class="btn" id="closeBtn" style="background:#111;color:#fff;font-size:16px;padding:12px 18px;">
+        Close
+      </button>
+      <div class="small">Tip: You can customize the message in the code.</div>
+    </div>
+  </div>
+
+  <script>
+    // --- Customize via URL: ?name=YourName ---
+    const params = new URLSearchParams(location.search);
+    const name = (params.get("name") || "nirali").trim();
+    document.getElementById("who").textContent = name.toLowerCase();
+
+    const arena = document.getElementById("arena");
+    const noBtn = document.getElementById("noBtn");
+    const yesBtn = document.getElementById("yesBtn");
+    const modal = document.getElementById("modal");
+    const closeBtn = document.getElementById("closeBtn");
+
+    // Make "No" dodge within the arena bounds
+    function moveNoButton() {
+      const arenaRect = arena.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const padding = 10;
+
+      const maxX = arenaRect.width - btnRect.width - padding;
+      const maxY = arenaRect.height - btnRect.height - padding;
+
+      const x = padding + Math.random() * Math.max(0, maxX);
+      const y = padding + Math.random() * Math.max(0, maxY);
+
+      noBtn.style.left = `${x + btnRect.width / 2}px`;
+      noBtn.style.top  = `${y + btnRect.height / 2}px`;
+
+      // little smoothness
+      noBtn.style.transition = "left 120ms ease, top 120ms ease, transform 120ms ease";
+      noBtn.style.transform = "translate(-50%, -50%) scale(0.98)";
+      setTimeout(() => (noBtn.style.transform = "translate(-50%, -50%) scale(1)"), 140);
+    }
+
+    // Dodge triggers (mouse + touch)
+    ["mouseenter", "pointerenter", "touchstart", "pointerdown"].forEach(evt => {
+      noBtn.addEventListener(evt, (e) => {
+        // prevent "No" from being clicked on touch
+        e.preventDefault?.();
+        moveNoButton();
+      }, { passive: false });
+    });
+
+    // If someone somehow clicks it anyway, still dodge
+    noBtn.addEventListener("click", (e) => {
+      e.preventDefault();
+      moveNoButton();
+    });
+
+    // Show success on Yes
+    yesBtn.addEventListener("click", () => {
+      modal.classList.add("open");
+      // optional: confetti-ish emoji
+      document.getElementById("mText").textContent =
+        `I knew you’d say yes, ${name}! 💞`;
+    });
+
+    closeBtn.addEventListener("click", () => modal.classList.remove("open"));
+    modal.addEventListener("click", (e) => {
+      if (e.target === modal) modal.classList.remove("open");
+    });
+
+    // Place No initially in a valid random spot
+    window.addEventListener("load", moveNoButton);
+    window.addEventListener("resize", () => {
+      // keep it in bounds after resize
+      moveNoButton();
+    });
+  </script>
+</body>
+</html>
